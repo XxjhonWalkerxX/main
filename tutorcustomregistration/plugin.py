@@ -21,6 +21,9 @@ CUSTOM_REGISTRATION_FIELDS_ENABLED = True
 # Enable dynamic registration fields in MFE
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 
+# Simple middleware to process custom fields
+MIDDLEWARE += ['tutor_customregistration.middleware.CustomRegistrationMiddleware']
+
 # Add custom app to installed apps - COMENTADO TEMPORALMENTE
 # INSTALLED_APPS += ['customregistration']
 
@@ -172,11 +175,24 @@ REGISTRATION_EXTRA_FIELDS = {
 # Custom registration app configuration
 CUSTOM_REGISTRATION_FIELDS_ENABLED = True
 
-# Registration API configuration - COMENTADO TEMPORALMENTE
-# REGISTRATION_EXTENSION_FORM = 'customregistration.forms.CustomRegistrationExtensionForm'
+# Simple backend processing without Django apps
+REGISTRATION_EXTRA_FIELDS_PROCESSING = True
 
 # Enable validation for custom fields
 CUSTOM_FIELD_VALIDATION_ENABLED = True
+
+# Simple profile field mapping
+PROFILE_FIELD_MAPPING = {
+    'primer_apellido': 'meta.primer_apellido',
+    'segundo_apellido': 'meta.segundo_apellido', 
+    'numero_telefono': 'meta.numero_telefono',
+    'estado': 'meta.estado',
+    'municipio': 'meta.municipio',
+    'nombre_escuela': 'meta.nombre_escuela',
+    'cct': 'meta.cct',
+    'grado': 'meta.grado',
+    'curp': 'meta.curp'
+}
 """),
 ])
 
