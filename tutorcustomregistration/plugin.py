@@ -181,6 +181,23 @@ REGISTRATION_EXTRA_FIELDS_PROCESSING = True
 # Enable validation for custom fields
 CUSTOM_FIELD_VALIDATION_ENABLED = True
 
+# Load custom registration signals
+import sys
+import os
+
+# Add plugin path to Python path
+plugin_path = '/opt/registro-plugins'
+if plugin_path not in sys.path:
+    sys.path.insert(0, plugin_path)
+
+# Import and setup custom registration signals
+try:
+    from tutorcustomregistration.signals import CustomRegistrationHandler
+    CUSTOM_REGISTRATION_HANDLER = CustomRegistrationHandler
+    print("✅ Custom registration signals loaded successfully")
+except ImportError as e:
+    print(f"⚠️  Could not load custom registration signals: {e}")
+
 # Simple profile field mapping
 PROFILE_FIELD_MAPPING = {
     'primer_apellido': 'meta.primer_apellido',
@@ -196,11 +213,45 @@ PROFILE_FIELD_MAPPING = {
 """),
 ])
 
-# Plugin initialization using hooks instead of dockerfile patches
+# Plugin initialization using hooks
 @hooks.Actions.CORE_READY.add()
 def _initialize_custom_registration():
     """Initialize the custom registration plugin"""
     pass
+
+# Hook to override registration field validation
+@hooks.Filters.ENV_PATCHES.add_item(
+    ("openedx-lms-production-settings", """
+# Custom field validation override
+def validate_registration_fields(request_data):
+    '''Custom validation for Mexican fields'''
+    errors = {}
+    
+    # CURP validation (más permisivo para pruebas)
+    if 'curp' in request_data:
+        curp = str(request_data['curp']).strip()
+        if len(curp) < 15 or len(curp) > 20:
+            errors['curp'] = f'CURP debe tener entre 15-20 caracteres (tiene {len(curp)})'
+    
+    # CCT validation (más permisivo)  
+    if 'cct' in request_data:
+        cct = str(request_data['cct']).strip()
+        if len(cct) < 8 or len(cct) > 12:
+            errors['cct'] = f'CCT debe tener entre 8-12 caracteres (tiene {len(cct)})'
+    
+    # Phone validation (más permisivo)
+    if 'numero_telefono' in request_data:
+        phone = str(request_data['numero_telefono']).strip()
+        clean_phone = ''.join(filter(str.isdigit, phone))
+        if len(clean_phone) < 8 or len(clean_phone) > 12:
+            errors['numero_telefono'] = f'Teléfono debe tener entre 8-12 dígitos (tiene {len(clean_phone)})'
+    
+    return errors
+
+# Make validation function available globally
+CUSTOM_FIELD_VALIDATOR = validate_registration_fields
+""")
+)
 
 # Template files will be provided via Python package installation
 # No need to modify Dockerfile
