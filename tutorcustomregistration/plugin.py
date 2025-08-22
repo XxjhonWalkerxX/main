@@ -21,8 +21,8 @@ CUSTOM_REGISTRATION_FIELDS_ENABLED = True
 # Enable dynamic registration fields in MFE
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 
-# Add custom app to installed apps
-INSTALLED_APPS += ['customregistration']
+# Add custom app to installed apps - COMENTADO TEMPORALMENTE
+# INSTALLED_APPS += ['customregistration']
 
 # Define custom registration fields that Open edX should recognize
 REGISTRATION_EXTRA_FIELDS = {
@@ -151,7 +151,7 @@ REGISTRATION_FIELD_VALIDATORS = {
     ("openedx-cms-production-settings", """
 # Enable custom registration fields for Studio
 CUSTOM_REGISTRATION_FIELDS_ENABLED = True
-INSTALLED_APPS += ['customregistration']
+# INSTALLED_APPS += ['customregistration']  # COMENTADO TEMPORALMENTE
 
 # Same registration fields for CMS
 REGISTRATION_EXTRA_FIELDS = {
@@ -172,8 +172,8 @@ REGISTRATION_EXTRA_FIELDS = {
 # Custom registration app configuration
 CUSTOM_REGISTRATION_FIELDS_ENABLED = True
 
-# Registration API configuration
-REGISTRATION_EXTENSION_FORM = 'customregistration.forms.CustomRegistrationExtensionForm'
+# Registration API configuration - COMENTADO TEMPORALMENTE
+# REGISTRATION_EXTENSION_FORM = 'customregistration.forms.CustomRegistrationExtensionForm'
 
 # Enable validation for custom fields
 CUSTOM_FIELD_VALIDATION_ENABLED = True
