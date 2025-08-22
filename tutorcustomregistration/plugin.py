@@ -11,7 +11,7 @@ config = {
     ]
 }
 
-# Plugin patches
+# Plugin patches - usando hooks en lugar de dockerfile patches
 hooks.Filters.ENV_PATCHES.add_items([
     # LMS settings patch
     ("openedx-lms-production-settings", """
@@ -180,38 +180,11 @@ CUSTOM_FIELD_VALIDATION_ENABLED = True
 """),
 ])
 
-# Template patches to add the Django app
-hooks.Filters.ENV_PATCHES.add_items([
-    ("openedx-dockerfile-post-python-requirements", """
-# Copy and install custom registration app
-COPY --chown=app:app ./plugins/customregistration /openedx/customregistration
-RUN pip install -e /openedx/customregistration
-"""),
-    
-    # URL configuration patch
-    ("openedx-lms-common-settings", """
-# Custom registration URLs
-ROOT_URLCONF_OVERRIDES = getattr(locals().get('ROOT_URLCONF_OVERRIDES', {}), 'copy', lambda: {})()
-ROOT_URLCONF_OVERRIDES.update({
-    'customregistration': 'customregistration.urls'
-})
-"""),
-])
-
-# Plugin hooks for initialization
+# Plugin initialization using hooks instead of dockerfile patches
 @hooks.Actions.CORE_READY.add()
-def _patch_registration_view():
-    """Patch the registration view to use our custom one"""
-    from tutor.hooks import priorities
-    hooks.Filters.ENV_PATCHES.add_item(
-        ("openedx-lms-production-settings", """
-# Override registration view with custom one
-REGISTRATION_VIEW = 'customregistration.views.CustomRegistrationView'
+def _initialize_custom_registration():
+    """Initialize the custom registration plugin"""
+    pass
 
-# Add custom middleware for registration processing
-MIDDLEWARE += [
-    'customregistration.middleware.CustomRegistrationMiddleware'
-]
-"""),
-        priority=priorities.HIGH
-    )
+# Template files will be provided via Python package installation
+# No need to modify Dockerfile
