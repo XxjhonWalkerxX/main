@@ -27,7 +27,7 @@ ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 # Add custom app to installed apps - COMENTADO TEMPORALMENTE
 # INSTALLED_APPS += ['customregistration']
 
-# Define custom registration fields that Open edX should recognize
+# Define custom registration fields that Open edX should recognize - MUY PERMISIVO PARA PRUEBAS
 REGISTRATION_EXTRA_FIELDS = {
     'primer_apellido': {
         'type': 'text',
@@ -51,84 +51,83 @@ REGISTRATION_EXTRA_FIELDS = {
     'numero_telefono': {
         'type': 'text',
         'label': 'Número de Teléfono',
-        'required': True,
-        'max_length': 10,
-        'min_length': 10,
-        'regex': r'^[0-9]{10}$',
+        'required': False,
+        'max_length': 20,
+        'min_length': 5,
         'error_messages': {
-            'required': 'El número de teléfono es obligatorio.',
-            'invalid': 'El teléfono debe tener exactamente 10 dígitos.',
-            'regex': 'El teléfono debe contener solo números.'
+            'max_length': 'El teléfono no puede tener más de 20 caracteres.',
+            'min_length': 'El teléfono debe tener al menos 5 dígitos.'
         }
     },
     'estado': {
         'type': 'text',
         'label': 'Estado',
-        'required': True,
+        'required': False,
         'max_length': 100,
         'error_messages': {
-            'required': 'El estado es obligatorio.',
             'max_length': 'El estado no puede tener más de 100 caracteres.'
         }
     },
     'municipio': {
         'type': 'text',
         'label': 'Municipio',
-        'required': True,
+        'required': False,
         'max_length': 100,
         'error_messages': {
-            'required': 'El municipio es obligatorio.',
             'max_length': 'El municipio no puede tener más de 100 caracteres.'
         }
     },
     'nombre_escuela': {
         'type': 'text',
         'label': 'Nombre de la Escuela',
-        'required': True,
+        'required': False,
         'max_length': 200,
         'error_messages': {
-            'required': 'El nombre de la escuela es obligatorio.',
             'max_length': 'El nombre de la escuela no puede tener más de 200 caracteres.'
         }
     },
     'cct': {
         'type': 'text',
         'label': 'CCT',
-        'required': True,
-        'max_length': 10,
-        'min_length': 10,
-        'regex': r'^[0-9]{2}[A-Z]{3}[0-9]{4}[A-Z]$',
+        'required': False,
+        'max_length': 30,
+        'min_length': 3,
         'error_messages': {
-            'required': 'La CCT es obligatoria.',
-            'invalid': 'La CCT debe tener el formato válido (10 caracteres).',
-            'regex': 'La CCT debe seguir el formato: 2 números + 3 letras + 4 números + 1 letra.'
+            'max_length': 'La CCT no puede tener más de 30 caracteres.',
+            'min_length': 'La CCT debe tener al menos 3 caracteres.'
         }
     },
     'grado': {
         'type': 'text',
         'label': 'Grado',
-        'required': True,
+        'required': False,
         'max_length': 50,
         'error_messages': {
-            'required': 'El grado es obligatorio.',
             'max_length': 'El grado no puede tener más de 50 caracteres.'
         }
     },
     'curp': {
         'type': 'text',
         'label': 'CURP',
-        'required': True,
-        'max_length': 18,
-        'min_length': 18,
-        'regex': r'^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9]{2}$',
+        'required': False,
+        'max_length': 30,
+        'min_length': 5,
         'error_messages': {
-            'required': 'El CURP es obligatorio.',
-            'invalid': 'El CURP debe tener el formato válido mexicano.',
-            'regex': 'El CURP debe tener 18 caracteres en formato válido.',
-            'unique': 'Este CURP ya está registrado en el sistema.'
+            'max_length': 'El CURP no puede tener más de 30 caracteres.',
+            'min_length': 'El CURP debe tener al menos 5 caracteres.'
         }
     }
 }
+
+# Disable terms of service requirement for testing
+REGISTRATION_EXTRA_FIELD_SETTINGS = {
+    'terms_of_service': {
+        'required': False
+    }
+}
+
+# Optional: Configure terms of service
+TERMS_OF_SERVICE_REQUIRED = False
 
 # Extended profile fields configuration
 EXTENDED_PROFILE_FIELDS = ['primer_apellido', 'segundo_apellido', 'numero_telefono', 'estado', 'municipio', 'nombre_escuela', 'cct', 'grado', 'curp']
@@ -156,17 +155,17 @@ REGISTRATION_FIELD_VALIDATORS = {
 CUSTOM_REGISTRATION_FIELDS_ENABLED = True
 # INSTALLED_APPS += ['customregistration']  # COMENTADO TEMPORALMENTE
 
-# Same registration fields for CMS
+# Same registration fields for CMS - MUY PERMISIVO
 REGISTRATION_EXTRA_FIELDS = {
-    'primer_apellido': {'type': 'text', 'label': 'Primer Apellido', 'required': True},
-    'segundo_apellido': {'type': 'text', 'label': 'Segundo Apellido', 'required': False},
-    'numero_telefono': {'type': 'text', 'label': 'Número de Teléfono', 'required': True},
-    'estado': {'type': 'text', 'label': 'Estado', 'required': True},
-    'municipio': {'type': 'text', 'label': 'Municipio', 'required': True},
-    'nombre_escuela': {'type': 'text', 'label': 'Nombre de la Escuela', 'required': True},
-    'cct': {'type': 'text', 'label': 'CCT', 'required': True},
-    'grado': {'type': 'text', 'label': 'Grado', 'required': True},
-    'curp': {'type': 'text', 'label': 'CURP', 'required': True}
+    'primer_apellido': {'type': 'text', 'label': 'Primer Apellido', 'required': True, 'max_length': 100},
+    'segundo_apellido': {'type': 'text', 'label': 'Segundo Apellido', 'required': False, 'max_length': 100},
+    'numero_telefono': {'type': 'text', 'label': 'Número de Teléfono', 'required': False, 'max_length': 20},
+    'estado': {'type': 'text', 'label': 'Estado', 'required': False, 'max_length': 100},
+    'municipio': {'type': 'text', 'label': 'Municipio', 'required': False, 'max_length': 100},
+    'nombre_escuela': {'type': 'text', 'label': 'Nombre de la Escuela', 'required': False, 'max_length': 200},
+    'cct': {'type': 'text', 'label': 'CCT', 'required': False, 'max_length': 30},
+    'grado': {'type': 'text', 'label': 'Grado', 'required': False, 'max_length': 50},
+    'curp': {'type': 'text', 'label': 'CURP', 'required': False, 'max_length': 30}
 }
 """),
 
