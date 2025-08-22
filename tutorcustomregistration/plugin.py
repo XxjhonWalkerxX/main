@@ -22,8 +22,8 @@ ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 # Disable terms of service requirement completely
 ENABLE_REGISTRATION_TERMS_OF_SERVICE = False
 
-# Habilitar middleware para capturar datos custom
-MIDDLEWARE += ['tutorcustomregistration.middleware.CustomRegistrationMiddleware']
+# Habilitar middleware para capturar datos custom - COMENTADO TEMPORALMENTE
+# MIDDLEWARE += ['tutorcustomregistration.middleware.CustomRegistrationMiddleware']
 
 # Logging para debug
 LOGGING['loggers']['tutorcustomregistration'] = {
