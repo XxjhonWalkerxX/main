@@ -1,1 +1,0 @@
-# Custom registration fields app

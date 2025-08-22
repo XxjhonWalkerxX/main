@@ -15,143 +15,99 @@ config = {
 hooks.Filters.ENV_PATCHES.add_items([
     # LMS settings patch
     ("openedx-lms-production-settings", """
+from tutor import hooks
+
+# Plugin metadata
+__version__ = "1.0.0"
+name = "customregistration"
+
+# Plugin configuration
+config = {
+    "add": [
+        ("CUSTOM_REGISTRATION_ENABLED", True),
+    ]
+}
+
+# Plugin patches - Solo lo esencial
+hooks.Filters.ENV_PATCHES.add_items([
+    # LMS settings patch
+    ("openedx-lms-production-settings", """
 # Custom registration fields configuration
 CUSTOM_REGISTRATION_FIELDS_ENABLED = True
-
-# Enable dynamic registration fields in MFE
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 
 # Disable terms of service requirement completely
-REGISTRATION_EXTRA_FIELDS_PROCESSORS = []
 ENABLE_REGISTRATION_TERMS_OF_SERVICE = False
-MARKETING_SITE_ROOT = ""
 
-# Simple middleware to process custom fields - COMENTADO TEMPORALMENTE
-# MIDDLEWARE += ['tutor_customregistration.middleware.CustomRegistrationMiddleware']
+# Habilitar middleware para capturar datos custom
+MIDDLEWARE += ['tutorcustomregistration.middleware.CustomRegistrationMiddleware']
 
-# Add custom app to installed apps - COMENTADO TEMPORALMENTE
-# INSTALLED_APPS += ['customregistration']
+# Logging para debug
+LOGGING['loggers']['tutorcustomregistration'] = {
+    'handlers': ['console'],
+    'level': 'INFO',
+    'propagate': True,
+}
 
-# Define custom registration fields that Open edX should recognize - MUY PERMISIVO PARA PRUEBAS
+# Define custom registration fields - PERMISIVOS PARA FACILITAR REGISTRO
 REGISTRATION_EXTRA_FIELDS = {
     'primer_apellido': {
         'type': 'text',
         'label': 'Primer Apellido',
-        'required': True,
-        'max_length': 100,
-        'error_messages': {
-            'required': 'El primer apellido es obligatorio.',
-            'max_length': 'El primer apellido no puede tener más de 100 caracteres.'
-        }
+        'required': False,
+        'max_length': 100
     },
     'segundo_apellido': {
-        'type': 'text',
+        'type': 'text', 
         'label': 'Segundo Apellido',
         'required': False,
-        'max_length': 100,
-        'error_messages': {
-            'max_length': 'El segundo apellido no puede tener más de 100 caracteres.'
-        }
+        'max_length': 100
     },
     'numero_telefono': {
         'type': 'text',
-        'label': 'Número de Teléfono',
+        'label': 'Número de Teléfono', 
         'required': False,
-        'max_length': 20,
-        'min_length': 5,
-        'error_messages': {
-            'max_length': 'El teléfono no puede tener más de 20 caracteres.',
-            'min_length': 'El teléfono debe tener al menos 5 dígitos.'
-        }
+        'max_length': 20
     },
     'estado': {
         'type': 'text',
         'label': 'Estado',
-        'required': False,
-        'max_length': 100,
-        'error_messages': {
-            'max_length': 'El estado no puede tener más de 100 caracteres.'
-        }
+        'required': False, 
+        'max_length': 100
     },
     'municipio': {
         'type': 'text',
         'label': 'Municipio',
         'required': False,
-        'max_length': 100,
-        'error_messages': {
-            'max_length': 'El municipio no puede tener más de 100 caracteres.'
-        }
+        'max_length': 100
     },
     'nombre_escuela': {
         'type': 'text',
         'label': 'Nombre de la Escuela',
         'required': False,
-        'max_length': 200,
-        'error_messages': {
-            'max_length': 'El nombre de la escuela no puede tener más de 200 caracteres.'
-        }
+        'max_length': 200
     },
     'cct': {
         'type': 'text',
         'label': 'CCT',
         'required': False,
-        'max_length': 30,
-        'min_length': 3,
-        'error_messages': {
-            'max_length': 'La CCT no puede tener más de 30 caracteres.',
-            'min_length': 'La CCT debe tener al menos 3 caracteres.'
-        }
+        'max_length': 30
     },
     'grado': {
         'type': 'text',
-        'label': 'Grado',
+        'label': 'Grado', 
         'required': False,
-        'max_length': 50,
-        'error_messages': {
-            'max_length': 'El grado no puede tener más de 50 caracteres.'
-        }
+        'max_length': 50
     },
     'curp': {
         'type': 'text',
         'label': 'CURP',
         'required': False,
-        'max_length': 30,
-        'min_length': 5,
-        'error_messages': {
-            'max_length': 'El CURP no puede tener más de 30 caracteres.',
-            'min_length': 'El CURP debe tener al menos 5 caracteres.'
-        }
+        'max_length': 30
     }
 }
-
-# Disable terms of service requirement for testing
-REGISTRATION_EXTRA_FIELD_SETTINGS = {
-    'terms_of_service': {
-        'required': False
-    }
-}
-
-# Optional: Configure terms of service
-TERMS_OF_SERVICE_REQUIRED = False
-
-# Extended profile fields configuration
-EXTENDED_PROFILE_FIELDS = ['primer_apellido', 'segundo_apellido', 'numero_telefono', 'estado', 'municipio', 'nombre_escuela', 'cct', 'grado', 'curp']
-
-# Registration field validation (legacy support)
-REGISTRATION_FIELD_VALIDATORS = {
-    'curp': {
-        'regex': r'^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9]{2}$',
-        'message': 'El CURP debe tener el formato válido mexicano'
-    },
-    'cct': {
-        'regex': r'^[0-9]{2}[A-Z]{3}[0-9]{4}[A-Z]$',
-        'message': 'La CCT debe tener el formato válido (10 caracteres)'
-    },
-    'numero_telefono': {
-        'regex': r'^[0-9]{10}$',
-        'message': 'El teléfono debe tener 10 dígitos'
-    }
-}
+"""),
+])
 """),
 
     # CMS settings patch  
