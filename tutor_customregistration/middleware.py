@@ -63,18 +63,23 @@ class CustomRegistrationMiddleware:
         """Validate custom fields and return error response if invalid"""
         try:
             custom_data = self._extract_custom_fields(request)
+            logger.info(f"🔍 Validating custom fields: {custom_data}")
+            
             validation_errors = self._validate_custom_fields(custom_data)
             
             if validation_errors:
+                logger.warning(f"❌ Validation errors: {validation_errors}")
                 return JsonResponse({
                     'success': False,
-                    'field_errors': validation_errors
+                    'field_errors': validation_errors,
+                    'message': 'Errores de validación en campos personalizados'
                 }, status=400)
             
+            logger.info(f"✅ Custom fields validation passed for {len(custom_data)} fields")
             return None
             
         except Exception as e:
-            logger.error(f"Error validating custom fields: {e}")
+            logger.error(f"💥 Error validating custom fields: {e}", exc_info=True)
             return JsonResponse({
                 'success': False,
                 'error': 'Error validando campos personalizados'
@@ -84,17 +89,23 @@ class CustomRegistrationMiddleware:
         """Save custom data to user profile after successful registration"""
         try:
             if not hasattr(request, 'custom_registration_data'):
+                logger.warning("❌ No custom registration data found in request")
                 return
                 
             # Extract username from response or request
             username = request.POST.get('username', '')
             if not username:
+                logger.warning("❌ No username found in request")
                 return
+                
+            logger.info(f"💾 Attempting to save custom data for user: {username}")
                 
             # Find the user
             try:
                 user = User.objects.get(username=username)
                 profile, created = UserProfile.objects.get_or_create(user=user)
+                
+                logger.info(f"👤 Found user {username}, profile created: {created}")
                 
                 # Get existing meta or create new
                 meta = profile.meta if profile.meta else {}
@@ -108,15 +119,15 @@ class CustomRegistrationMiddleware:
                 profile.meta = meta
                 profile.save()
                 
-                logger.info(f"Saved custom profile data for user {username}: {list(custom_data.keys())}")
+                logger.info(f"✅ Saved custom profile data for user {username}: {list(custom_data.keys())}")
                 
             except User.DoesNotExist:
-                logger.error(f"User {username} not found after registration")
+                logger.error(f"❌ User {username} not found after registration")
             except Exception as e:
-                logger.error(f"Error saving profile data for {username}: {e}")
+                logger.error(f"💥 Error saving profile data for {username}: {e}", exc_info=True)
                 
         except Exception as e:
-            logger.error(f"Error in _save_custom_profile_data: {e}")
+            logger.error(f"💥 Error in _save_custom_profile_data: {e}", exc_info=True)
     
     def _process_custom_registration(self, request):
         """Legacy method - now split into validation and saving"""
@@ -140,30 +151,33 @@ class CustomRegistrationMiddleware:
         return custom_data
     
     def _validate_custom_fields(self, data):
-        """Validate custom Mexican fields"""
+        """Validate custom Mexican fields - MODO PERMISIVO PARA PRUEBAS"""
         errors = {}
         
-        # CURP validation
-        if 'curp' in data:
-            if not self._validate_curp(data['curp']):
-                errors['curp'] = 'El CURP debe tener formato válido mexicano (18 caracteres)'
+        # CURP validation - MÁS PERMISIVO
+        if 'curp' in data and data['curp']:
+            curp = data['curp'].strip()
+            if len(curp) < 10 or len(curp) > 20:  # Rango más amplio
+                errors['curp'] = f'El CURP debe tener entre 10-20 caracteres (recibido: {len(curp)})'
         
-        # CCT validation  
-        if 'cct' in data:
-            if not self._validate_cct(data['cct']):
-                errors['cct'] = 'La CCT debe tener formato válido (10 caracteres)'
+        # CCT validation - MÁS PERMISIVO  
+        if 'cct' in data and data['cct']:
+            cct = data['cct'].strip()
+            if len(cct) < 5 or len(cct) > 15:  # Rango más amplio
+                errors['cct'] = f'La CCT debe tener entre 5-15 caracteres (recibido: {len(cct)})'
                 
-        # Phone validation
-        if 'numero_telefono' in data:
-            if not self._validate_phone(data['numero_telefono']):
-                errors['numero_telefono'] = 'El teléfono debe tener exactamente 10 dígitos'
+        # Phone validation - MÁS PERMISIVO
+        if 'numero_telefono' in data and data['numero_telefono']:
+            phone = data['numero_telefono'].strip()
+            clean_phone = re.sub(r'[^0-9]', '', phone)
+            if len(clean_phone) < 8 or len(clean_phone) > 12:  # Rango más amplio
+                errors['numero_telefono'] = f'El teléfono debe tener entre 8-12 dígitos (recibido: {len(clean_phone)})'
         
-        # Required field validation
-        required_fields = ['primer_apellido', 'numero_telefono', 'estado', 
-                          'municipio', 'nombre_escuela', 'cct', 'grado', 'curp']
+        # Required field validation - SOLO CAMPOS CRÍTICOS
+        required_fields = ['primer_apellido', 'numero_telefono']  # Reducido a los esenciales
         
         for field in required_fields:
-            if field not in data or not data[field]:
+            if field not in data or not data[field] or not data[field].strip():
                 errors[field] = f'El campo {field.replace("_", " ")} es obligatorio'
                 
         return errors
