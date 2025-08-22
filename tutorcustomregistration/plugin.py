@@ -219,8 +219,8 @@ def _initialize_custom_registration():
     """Initialize the custom registration plugin"""
     pass
 
-# Hook to override registration field validation
-@hooks.Filters.ENV_PATCHES.add_item(
+# Additional LMS settings for validation
+hooks.Filters.ENV_PATCHES.add_item(
     ("openedx-lms-production-settings", """
 # Custom field validation override
 def validate_registration_fields(request_data):
@@ -252,6 +252,3 @@ def validate_registration_fields(request_data):
 CUSTOM_FIELD_VALIDATOR = validate_registration_fields
 """)
 )
-
-# Template files will be provided via Python package installation
-# No need to modify Dockerfile
