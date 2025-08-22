@@ -21,6 +21,11 @@ CUSTOM_REGISTRATION_FIELDS_ENABLED = True
 # Enable dynamic registration fields in MFE
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 
+# Disable terms of service requirement completely
+REGISTRATION_EXTRA_FIELDS_PROCESSORS = []
+ENABLE_REGISTRATION_TERMS_OF_SERVICE = False
+MARKETING_SITE_ROOT = ""
+
 # Simple middleware to process custom fields - COMENTADO TEMPORALMENTE
 # MIDDLEWARE += ['tutor_customregistration.middleware.CustomRegistrationMiddleware']
 
@@ -173,6 +178,12 @@ REGISTRATION_EXTRA_FIELDS = {
     ("openedx-common-settings", """
 # Custom registration app configuration
 CUSTOM_REGISTRATION_FIELDS_ENABLED = True
+
+# Completely disable terms of service validation
+REGISTRATION_EXTENSION_FORM = None
+ENABLE_TERMS_AND_CONDITIONS_CHECKBOX = False
+MARKETING_EMAIL_OPT_IN = False
+ENABLE_MARKETING_EMAIL_OPT_IN = False
 
 # Simple backend processing without Django apps
 REGISTRATION_EXTRA_FIELDS_PROCESSING = True
