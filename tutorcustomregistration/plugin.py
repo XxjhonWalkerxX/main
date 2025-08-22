@@ -21,8 +21,8 @@ CUSTOM_REGISTRATION_FIELDS_ENABLED = True
 # Enable dynamic registration fields in MFE
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = True
 
-# Simple middleware to process custom fields
-MIDDLEWARE += ['tutor_customregistration.middleware.CustomRegistrationMiddleware']
+# Simple middleware to process custom fields - COMENTADO TEMPORALMENTE
+# MIDDLEWARE += ['tutor_customregistration.middleware.CustomRegistrationMiddleware']
 
 # Add custom app to installed apps - COMENTADO TEMPORALMENTE
 # INSTALLED_APPS += ['customregistration']
