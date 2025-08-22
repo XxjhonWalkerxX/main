@@ -11,7 +11,7 @@ config = {
     ]
 }
 
-# Plugin patches - SÚPER SIMPLE, solo campos
+# Plugin patches - Solo campos, SIN captura de datos para evitar errores
 hooks.Filters.ENV_PATCHES.add_items([
     # LMS settings patch
     ("openedx-lms-production-settings", """
@@ -86,5 +86,13 @@ REGISTRATION_EXTRA_FIELDS = {
         'max_length': 30
     }
 }
+"""),
+])
+
+# Crear el archivo de captura de datos por separado usando hooks
+hooks.Filters.ENV_PATCHES.add_items([
+    ("openedx-lms-common-settings", """
+# Instalar el procesador de datos mexicanos
+INSTALLED_APPS += ('tutorcustomregistration.mexican_data_processor',)
 """),
 ])
